@@ -1,0 +1,16 @@
+{
+  "name": "Complice de Classe — Boîte à supports MS/GS",
+  "short_name": "Complice",
+  "description": "Générateur de supports imprimables pour une classe de maternelle MS/GS.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#20233F",
+  "theme_color": "#20233F",
+  "icons": [
+    { "src": "./assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "./assets/icons/icon-1024.png", "sizes": "1024x1024", "type": "image/png" }
+  ]
+}
