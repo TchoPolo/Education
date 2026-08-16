@@ -140,7 +140,7 @@ details.notice ul{padding-left:18px;margin:12px 0 0}
 
 /* ----- Éléments imprimés ----- */
 .grille{margin-bottom:-2mm}
-.carte{display:inline-block;vertical-align:top;margin:0 2mm 2mm 0;background:#fff;overflow:hidden;
+.carte{display:block;vertical-align:top;margin:0;background:#fff;overflow:hidden;
   position:relative;page-break-inside:avoid;break-inside:avoid;font-family:var(--ecole);color:#20233F}
 .carte.cadre{border:1.2px solid #20233F}
 .carte.decoupe{border:1.2px dashed #7C8194}
@@ -735,10 +735,27 @@ function poserCartes(cartes,l,h){
   var c=$("feuilles");
   c.innerHTML="";
   if(!cartes.length){vider();return;}
-  var parPage=cartesParPage(l,h),pages=Math.ceil(cartes.length/parPage),p,i,f,g;
+  var cols=combien(UTILE_L,l),lig=combien(UTILE_H,h);
+  var parPage=cols*lig,pages=Math.ceil(cartes.length/parPage),p,i,f,g;
+  /* Chaque carte reçoit sa position exacte en millimètres, calculée par le script.
+     Aucun retour à la ligne implicite : ce que le calcul décide est ce qui s'affiche,
+     quel que soit le moteur du navigateur, y compris les plus anciens. */
+  var largeurGrille=cols*l+(cols-1)*GOUT;
+  var hauteurGrille=lig*h+(lig-1)*GOUT;
   for(p=0;p<pages;p++){
-    f=el("div","sheet");habillerFeuille(f);g=el("div","grille");
-    for(i=p*parPage;i<Math.min((p+1)*parPage,cartes.length);i++){g.appendChild(cartes[i]);}
+    f=el("div","sheet");habillerFeuille(f);
+    g=el("div","grille");
+    g.style.position="relative";
+    g.style.width=largeurGrille+"mm";
+    g.style.height=hauteurGrille+"mm";
+    for(i=p*parPage;i<Math.min((p+1)*parPage,cartes.length);i++){
+      var idx=i-p*parPage,col=idx%cols,rang=Math.floor(idx/cols);
+      var carte=cartes[i];
+      carte.style.position="absolute";
+      carte.style.left=(col*(l+GOUT))+"mm";
+      carte.style.top=(rang*(h+GOUT))+"mm";
+      g.appendChild(carte);
+    }
     f.appendChild(g);
     f.appendChild(el("div","sheet-num","Feuille "+(p+1)+" sur "+pages));
     c.appendChild(f);

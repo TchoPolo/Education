@@ -1,5 +1,29 @@
 # Journal des versions
 
+## 2.1.0
+
+### Corrigé — bug confirmé sur les étiquettes personnalisées
+Le nombre d'étiquettes par page ne correspondait pas toujours à ce que le réglage promettait.
+Cause : la disposition des étiquettes reposait sur le retour à la ligne naturel du
+navigateur, une mécanique qui peut interpréter différemment un même calcul selon le
+moteur de rendu. Le compte annoncé pouvait être juste tandis que la disposition
+réellement imprimée ne l'était pas.
+
+Correction : chaque étiquette reçoit désormais une position exacte, en millimètres,
+calculée et imposée par le script — plus aucun retour à la ligne laissé à l'appréciation
+du navigateur. Vérifié position par position, colonne par colonne, avec une étiquette de
+6,4 × 3,4 cm : 2 colonnes × 7 rangées = 14 à la marge de confort (10 mm), 3 colonnes × 8
+rangées = 24 à une marge de 5 mm — conforme dans les deux cas.
+
+Le banc d'essai vérifiait jusque-là seulement l'absence d'erreur, pas l'exactitude de la
+disposition ; c'est ce qui a laissé passer ce défaut. Trois contrôles géométriques stricts
+ont été ajoutés, qui rejouent la disposition réelle et la comparent au calcul attendu.
+
+### Corrigé — vérifié en conditions réelles
+La programmation par période (ticket précédent) a été revérifiée avec de vrais
+événements de formulaire plutôt que des appels internes : confirmé que changer de
+période ouvre bien une programmation distincte et conserve les saisies de chaque période.
+
 ## 2.0.0
 
 ### Changé

@@ -18,7 +18,7 @@ Aucune installation, aucun compte, aucune connexion : rien ne sort de l'ordinate
 
 | Module | Ce qu'il produit |
 |---|---|
-| **Étiquettes prénoms** | Porte-manteaux, cahiers, casiers, bandes de présence. Capitales, script, cursive, ou deux écritures superposées. Formats prédéfinis ou sur mesure au millimètre, marges de feuille réglables pour optimiser le nombre par page. |
+| **Étiquettes prénoms** | Porte-manteaux, cahiers, casiers, bandes de présence. Capitales, script, cursive, ou deux écritures superposées. Formats prédéfinis ou sur mesure au millimètre. Chaque étiquette est placée à une position calculée au millimètre — le nombre annoncé par page est toujours celui qui s'imprime. |
 | **Cartes nombres** | Chiffre, constellation du dé, doigts de la main, collection de jetons, nombre en lettres. Pour le référentiel, le loto, le mémory. |
 | **Fiches d'écriture** | Lignes de repère, quadrillage ou cadre vierge, avec modèle à repasser. |
 | **Jeu de paires** | Mémory des graphies ou association chiffre / constellation. |
@@ -75,7 +75,7 @@ Deux contrôles voyagent avec le dépôt et ne demandent que Node.js :
 
 ```bash
 node tests/structure.js     # cohérence entre le HTML et le script
-node tests/banc-essai.js    # 65 scénarios limites sur les huit modules
+node tests/banc-essai.js    # 68 scénarios limites sur les huit modules
 ```
 
 `structure.js` vérifie que chaque identifiant et chaque fonction appelés par la page
