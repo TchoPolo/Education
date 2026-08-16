@@ -1,6 +1,6 @@
 /* Service worker : rend l'outil utilisable sans connexion une fois la page ouverte une fois.
    Changer VERSION à chaque mise en ligne pour que les navigateurs prennent la nouvelle version. */
-var VERSION = "complice-v1.0.0";
+var VERSION = "classe-marion-v2.0.0";
 var FICHIERS = [
   "./",
   "./index.html",

@@ -1,5 +1,17 @@
 # Journal des versions
 
+## 2.0.0
+
+### Changé
+- L'application s'appelle désormais **La classe de Madame Marion**. Emblème et nom repris dans le bandeau, le manifeste d'application, le nom des fichiers de réglages et la mémoire du poste. Les anciens fichiers de réglages restent relisibles.
+- **Alphabet cursif entièrement reconstruit.** Les lettres ne sont plus tracées une à une à la main mais engendrées à partir des mêmes formes de base — même rond, même arche, même boucle, mêmes hauteurs. C'est cette régularité qui fait la lisibilité d'un modèle d'écriture. Trait légèrement épaissi, boucles hautes ramenées à 2,2 fois la hauteur des petites lettres, lignes de repère ajustées.
+
+### Corrigé
+- **Étiquettes : le nombre par feuille.** Les marges de la feuille et l'espace entre les étiquettes sont maintenant réglables. Une étiquette de 6,4 × 3,4 cm donne 14 par page avec la marge de confort, et **24 par page avec une marge de 5 mm**.
+- **Le `u` était construit comme un `n`** : sommets arrondis et creux pointus, alors que le `u` est exactement l'inverse. « quatre » se lisait « qnatne ». Le `y`, bâti sur le `u`, avait le même défaut.
+- Tracés du `r` et du `s` repris.
+- **Programmation : chaque période a désormais sa propre planification.** Changer de période ouvrait le même tableau ; les cinq périodes sont maintenant indépendantes et conservent chacune leurs saisies.
+
 ## 1.3.0
 
 ### Ajouté

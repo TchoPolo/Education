@@ -1,10 +1,12 @@
 <p align="center">
-  <img src="assets/logo-horizontal.png" alt="Complice de Classe" width="420">
+  <img src="assets/icons/icon-192.png" alt="" width="88">
 </p>
 
-<p align="center"><em>Tous vos outils, un seul complice.</em></p>
+<h1 align="center">La classe de Madame Marion</h1>
 
-# Boîte à supports MS / GS
+<p align="center"><em>Tous les supports de la classe, prêts à imprimer.</em></p>
+
+## Boîte à supports MS / GS
 
 Générateur de supports imprimables pour une classe de maternelle à double niveau
 moyenne section / grande section.
@@ -16,7 +18,7 @@ Aucune installation, aucun compte, aucune connexion : rien ne sort de l'ordinate
 
 | Module | Ce qu'il produit |
 |---|---|
-| **Étiquettes prénoms** | Porte-manteaux, cahiers, casiers, bandes de présence. Capitales, script, cursive, ou deux écritures superposées. Formats prédéfinis ou sur mesure au millimètre. |
+| **Étiquettes prénoms** | Porte-manteaux, cahiers, casiers, bandes de présence. Capitales, script, cursive, ou deux écritures superposées. Formats prédéfinis ou sur mesure au millimètre, marges de feuille réglables pour optimiser le nombre par page. |
 | **Cartes nombres** | Chiffre, constellation du dé, doigts de la main, collection de jetons, nombre en lettres. Pour le référentiel, le loto, le mémory. |
 | **Fiches d'écriture** | Lignes de repère, quadrillage ou cadre vierge, avec modèle à repasser. |
 | **Jeu de paires** | Mémory des graphies ou association chiffre / constellation. |
@@ -73,7 +75,7 @@ Deux contrôles voyagent avec le dépôt et ne demandent que Node.js :
 
 ```bash
 node tests/structure.js     # cohérence entre le HTML et le script
-node tests/banc-essai.js    # 61 scénarios limites sur les huit modules
+node tests/banc-essai.js    # 65 scénarios limites sur les huit modules
 ```
 
 `structure.js` vérifie que chaque identifiant et chaque fonction appelés par la page
@@ -105,8 +107,8 @@ repères « à partir de 4 ans » et « à partir de 5 ans » du texte.
 
 ## Avant toute diffusion publique
 
-La recherche d'antériorité auprès de l'INPI sur le nom **Complice de Classe** n'a pas été faite.
-Elle conditionne toute commercialisation.
+Si le projet devait être diffusé sous un nom de marque, une recherche d'antériorité auprès de l'INPI
+resterait à faire. Le nom actuel, « La classe de Madame Marion », est un usage personnel.
 
 ## Licence
 
