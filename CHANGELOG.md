@@ -1,5 +1,13 @@
 # Journal des versions
 
+## 2.3.1
+
+### Ajouté
+- Préréglage **Avery DP247-100** (24 étiquettes, 70 × 37 mm) sur la disposition « Planche d'étiquettes toute prête » : un clic règle le format, la grille 3 × 8 et remet les décalages à zéro, sans ressaisie manuelle des mesures.
+
+### Vérifié
+- Un signalement faisait état d'une bordure visible en haut et en bas de la planche exportée. Calcul et export direct revérifiés avec les dimensions exactes du produit (70 × 37 mm, 3 × 8) : la grille remplit la page à 0 mm de marge gauche/droite et 0,5 mm en haut/bas, conforme à la planche réelle. L'écart venait d'une dimension pas encore ajustée ; le nouveau préréglage l'élimine.
+
 ## 2.3.0
 
 ### Ajouté — export PDF direct pour les étiquettes, sans fenêtre d'impression

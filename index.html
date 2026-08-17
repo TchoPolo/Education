@@ -678,13 +678,17 @@ table.synthese tr.dom td{background:#F1EFF7;font-weight:700;font-size:8.5pt;
       </div>
 
       <div id="mp-bloc-planche" style="display:none">
+        <div class="champ">
+          <span class="legende">Planches courantes</span>
+          <button class="mini" onclick="preregPlanche('avery-dp247')">Avery DP247-100 — 24 étiquettes, 70 × 37 mm</button>
+        </div>
         <div class="duo">
           <div><label for="pl-cols">Étiquettes par ligne</label>
             <input type="number" id="pl-cols" value="3" min="1" max="10" oninput="dessiner()"></div>
           <div><label for="pl-lignes">Étiquettes par colonne</label>
             <input type="number" id="pl-lignes" value="8" min="1" max="15" oninput="dessiner()"></div>
         </div>
-        <p class="aide">Indiquez exactement la grille imprimée sur votre planche autocollante (comptez les étiquettes sur la feuille vierge). La grille est centrée automatiquement sur la page.</p>
+        <p class="aide">Indiquez exactement la grille imprimée sur votre planche autocollante (comptez les étiquettes sur la feuille vierge), ou choisissez une référence ci-dessus. La grille est centrée automatiquement sur la page.</p>
         <div class="duo">
           <div><label for="pl-dx">Décalage horizontal</label>
             <input type="number" id="pl-dx" value="0" min="-15" max="15" step="0.5" oninput="dessiner()"></div>
@@ -761,6 +765,21 @@ function majZoneUtile(){
   UTILE_H=297-2*MARGE;
 }
 function dispositionPlanche(){return $("mp-seg-planche").getAttribute("aria-selected")==="true";}
+var PLANCHES_CONNUES={
+  "avery-dp247":{larg:7,haut:3.7,cols:3,lignes:8}
+};
+function preregPlanche(cle){
+  var p=PLANCHES_CONNUES[cle];
+  if(!p){return;}
+  choisirDisposition("planche");
+  $("pr-format").value="perso";
+  $("pr-larg").value=String(p.larg);
+  $("pr-haut").value=String(p.haut);
+  $("pl-cols").value=String(p.cols);
+  $("pl-lignes").value=String(p.lignes);
+  $("pl-dx").value="0";$("pl-dy").value="0";
+  dessiner();
+}
 function choisirDisposition(mode){
   var planche=(mode==="planche");
   $("mp-seg-auto").setAttribute("aria-selected",planche?"false":"true");
