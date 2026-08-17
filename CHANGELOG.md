@@ -1,5 +1,37 @@
 # Journal des versions
 
+## 2.4.0
+
+### Corrigé — le raccourci Avery n'apparaissait pas
+Deux défauts réels dans la version précédente, pas un seul :
+- Le raccourci Avery DP247-100 était placé à l'intérieur du bloc « Planche », donc
+  invisible tant qu'on n'avait pas déjà basculé sur ce mode à la main — il fallait faire
+  l'action que le bouton devait faire à votre place pour le voir apparaître. Il est
+  maintenant visible dès l'ouverture de l'onglet Étiquettes, quel que soit le mode actif.
+- Le démarrage de la page appelait `dessiner()` au lieu de `ouvrir("prenoms")`, laissant
+  le bouton principal afficher « Enregistrer en PDF » au lieu de « Télécharger le PDF »
+  tant qu'aucun onglet n'avait été cliqué.
+
+### Ajouté — module Mes sauvegardes
+Nouvel onglet pour nommer et garder plusieurs réglages d'un même module, par exemple des
+étiquettes prénoms réglées pour les GS et une autre version pour les MS. On choisit le
+module, on tape un nom, on enregistre ; la liste des instantanés propose Charger et
+Supprimer, avec la date de chaque enregistrement. Chaque instantané reste propre à son
+module — recharger des étiquettes ne touche à rien d'autre.
+
+Le fichier complet transportable (pour changer d'ordinateur ou archiver en fin d'année),
+auparavant dispersé sous chaque module, est désormais centralisé dans ce même onglet.
+
+### Corrigé au passage
+- En cas d'échec d'enregistrement (mémoire du navigateur pleine ou bloquée), l'instantané
+  restait auparavant en mémoire vive sans être réellement écrit sur le disque — un
+  « fantôme » qui aurait disparu silencieusement à la fermeture de la page. L'enregistrement
+  annule maintenant proprement le changement en mémoire quand l'écriture échoue.
+- La liste des instantanés tronquait presque entièrement les noms courts (« GS » s'affichait
+  « … ») faute de place face à la date et aux deux boutons sur une seule ligne. Mise en page
+  revue : nom, date et actions sur des lignes séparées, lisibles quelle que soit la longueur
+  du nom.
+
 ## 2.3.1
 
 ### Ajouté

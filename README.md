@@ -14,7 +14,7 @@ moyenne section / grande section.
 Un seul fichier, `index.html`. On l'ouvre d'un double-clic, on règle, on enregistre en PDF.
 Aucune installation, aucun compte, aucune connexion : rien ne sort de l'ordinateur.
 
-## Les huit générateurs
+## Les neuf générateurs
 
 | Module | Ce qu'il produit |
 |---|---|
@@ -27,6 +27,7 @@ Aucune installation, aucun compte, aucune connexion : rien ne sort de l'ordinate
 | **Progression annuelle** | La trame des cinq périodes, une ligne MS et une ligne GS par compétence, rappel des vacances. Un domaine ou les six à la suite. Export PDF et Word. |
 | **Programmation** | Un tableau par domaine, colonne MS et colonne GS. Export PDF et Word. |
 | **Synthèse des acquis** | Le bilan de fin de grande section, un document par élève, conforme aux six domaines. Grille à cocher, bloc de commentaire, signatures. |
+| **Mes sauvegardes** | Enregistre les réglages d'un module sous un nom choisi — par exemple des étiquettes pour les GS, puis une autre version pour les MS — pour y revenir en un clic. Chaque instantané reste propre à son module. |
 
 ## Enregistrer et imprimer
 
@@ -52,6 +53,17 @@ en dessous, les réglages puis la feuille, les onglets défilant horizontalement
 Sur petit écran la feuille A4 est **réduite pour tenir dans la largeur**, mais elle
 s'imprime toujours à l'échelle réelle. Les champs de saisie font 16 px au minimum,
 sous peine de voir l'iPhone zoomer tout seul dès qu'on touche un champ.
+
+## Sauvegardes nommées
+
+L'onglet **Mes sauvegardes** enregistre les réglages d'un module sous le nom de votre choix,
+sur cet ordinateur. Utile pour garder plusieurs versions d'un même module — des étiquettes
+réglées pour les GS et une autre version pour les MS, par exemple — sans avoir à tout
+ressaisir à chaque fois. Chaque instantané reste propre à son module : recharger une
+sauvegarde des étiquettes ne touche pas à la programmation en cours.
+
+Pour transporter l'ensemble vers un autre ordinateur ou garder une archive en fin d'année,
+le même onglet propose aussi un fichier complet à télécharger et recharger.
 
 ## Données d'élèves
 
@@ -80,12 +92,12 @@ Deux contrôles voyagent avec le dépôt et ne demandent que Node.js :
 
 ```bash
 node tests/structure.js     # cohérence entre le HTML et le script
-node tests/banc-essai.js    # 81 scénarios limites sur les huit modules
+node tests/banc-essai.js    # 93 scénarios limites sur les neuf modules
 ```
 
 `structure.js` vérifie que chaque identifiant et chaque fonction appelés par la page
 existent réellement, et que chaque module a son onglet et son panneau.
-`banc-essai.js` rejoue les huit modules dans un DOM simulé : listes vides, bornes inversées,
+`banc-essai.js` rejoue les neuf modules dans un DOM simulé : listes vides, bornes inversées,
 dimensions aberrantes, caractères non gérés, aller-retour du fichier de réglages, mémoire locale du poste, export Word.
 
 À lancer avant toute mise en ligne. Les deux doivent afficher zéro échec.

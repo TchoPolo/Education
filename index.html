@@ -128,6 +128,18 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--corail);
 .seg[aria-selected="true"]{background:#fff;color:var(--encre);box-shadow:0 2px 6px rgba(10,12,30,.14)}
 .seg:focus-visible{outline:3px solid var(--jaune);outline-offset:1px}
 .rangee-io{margin-top:14px;padding-top:14px;border-top:1px solid var(--bord)}
+.mini.large{display:block;width:100%;padding:12px;font-size:14.5px;margin-top:4px}
+.mini.danger{color:var(--corail);border-color:#F3C7C3}
+.mini.danger:hover{background:#FFF3F1}
+.bloc-sauvegarde{margin-bottom:14px}
+.titre-sauvegarde{font-family:var(--titre);font-size:13px;font-weight:700;color:var(--encre-doux);
+  text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.ligne-sauvegarde{padding:10px 0;border-top:1px solid var(--bord)}
+.ligne-sauvegarde:first-of-type{border-top:0}
+.nom-sauvegarde{display:block;font-weight:700;font-size:14.5px;color:var(--encre);
+  overflow-wrap:break-word;margin-bottom:2px}
+.date-sauvegarde{display:block;font-size:11.5px;color:var(--encre-doux);margin-bottom:8px}
+.ligne-sauvegarde .mini{display:inline-block;width:auto;margin:0 8px 0 0;padding:8px 13px;font-size:12.5px}
 .rangee-io .mini{width:calc(50% - 4px);margin:0 0 0 0}
 .rangee-io .mini:first-child{margin-right:6px}
 
@@ -286,6 +298,7 @@ table.synthese tr.dom td{background:#F1EFF7;font-weight:700;font-size:8.5pt;
     <button class="tab" role="tab" id="t-cursive" aria-selected="false" onclick="ouvrir('cursive')">Écriture cursive</button>
       <button class="tab" role="tab" id="t-annuel" aria-selected="false" onclick="ouvrir('annuel')">Progression annuelle</button>
       <button class="tab" role="tab" id="t-synthese" aria-selected="false" onclick="ouvrir('synthese')">Synthèse des acquis</button>
+      <button class="tab" role="tab" id="t-sauvegardes" aria-selected="false" onclick="ouvrir('sauvegardes')">Mes sauvegardes</button>
       <button class="tab" role="tab" id="t-prog" aria-selected="false" onclick="ouvrir('prog')">Programmation</button>
   </div>
 </nav>
@@ -606,6 +619,31 @@ table.synthese tr.dom td{background:#F1EFF7;font-weight:700;font-size:8.5pt;
     </div>
   </div>
 
+  <div class="panel" id="p-sauvegardes" style="display:none">
+    <h2>Mes sauvegardes</h2>
+    <p class="quoi">Enregistrez les réglages d'un module sous un nom, pour y revenir en un clic — par exemple des étiquettes réglées pour les GS, puis une autre version pour les MS.</p>
+    <div class="champ">
+      <label for="sv-module">Module à sauvegarder</label>
+      <select id="sv-module"></select>
+    </div>
+    <div class="champ">
+      <label for="sv-nom">Nom de cet instantané</label>
+      <input type="text" id="sv-nom" placeholder="Par exemple : GS">
+    </div>
+    <button class="mini large" onclick="enregistrerInstantane()">Enregistrer sous ce nom</button>
+    <p class="aide" id="sv-etat"></p>
+    <div class="champ" style="margin-top:16px">
+      <span class="legende">Instantanés enregistrés</span>
+      <div id="sv-liste"></div>
+    </div>
+    <div class="rangee-io" style="margin-top:18px">
+      <span class="legende">Transporter vers un autre ordinateur</span>
+      <button class="mini" onclick="enregistrerReglages()">Télécharger un fichier complet</button><button class="mini" onclick="choisirFichier()">Charger depuis un fichier</button>
+      <input type="file" id="io-fichier" accept=".json,application/json" style="display:none" onchange="ouvrirReglages(event)">
+      <p class="aide" id="io-note">Ce fichier contient tout : listes, réglages et instantanés. Pratique pour passer d'un ordinateur à l'autre, ou garder une archive en fin d'année.</p>
+    </div>
+  </div>
+
   <div class="panel" id="p-prog" style="display:none">
     <h2>Programmation</h2>
     <p class="quoi">Un tableau par domaine. Programme du 7 mai 2026, applicable à la rentrée 2026-2027.</p>
@@ -646,12 +684,17 @@ table.synthese tr.dom td{background:#F1EFF7;font-weight:700;font-size:8.5pt;
     </div>
   </div>
 
-  <div class="action">
+  <div class="action" id="action-principale">
     <button class="btn-pdf" id="btn-pdf-principal" onclick="cliquerBoutonPrincipal()">Enregistrer en PDF</button>
     <button class="btn-secours" id="btn-pdf-secours" onclick="exporterPDF()" style="display:none">Utiliser plutôt l'impression du navigateur</button>
     <button class="btn-word" id="btn-word" onclick="exporterWord()" style="display:none">Enregistrer en Word</button>
     <p class="compte" id="compte">&nbsp;</p>
     <div class="reglage-feuille">
+      <div class="champ" id="pr-avery-raccourci">
+        <span class="legende">Planche autocollante toute prête ?</span>
+        <button class="mini" onclick="preregPlanche('avery-dp247')">Avery DP247-100 — 24 étiquettes, 70 × 37 mm</button>
+        <p class="aide">Règle tout en un clic : taille, grille 3 × 8, sans marge à calculer.</p>
+      </div>
       <span class="legende">Disposition sur la feuille</span>
       <div class="segment" role="tablist" aria-label="Disposition">
         <button type="button" class="seg" id="mp-seg-auto" aria-selected="true" onclick="choisirDisposition('auto')">Feuille libre</button>
@@ -678,17 +721,13 @@ table.synthese tr.dom td{background:#F1EFF7;font-weight:700;font-size:8.5pt;
       </div>
 
       <div id="mp-bloc-planche" style="display:none">
-        <div class="champ">
-          <span class="legende">Planches courantes</span>
-          <button class="mini" onclick="preregPlanche('avery-dp247')">Avery DP247-100 — 24 étiquettes, 70 × 37 mm</button>
-        </div>
         <div class="duo">
           <div><label for="pl-cols">Étiquettes par ligne</label>
             <input type="number" id="pl-cols" value="3" min="1" max="10" oninput="dessiner()"></div>
           <div><label for="pl-lignes">Étiquettes par colonne</label>
             <input type="number" id="pl-lignes" value="8" min="1" max="15" oninput="dessiner()"></div>
         </div>
-        <p class="aide">Indiquez exactement la grille imprimée sur votre planche autocollante (comptez les étiquettes sur la feuille vierge), ou choisissez une référence ci-dessus. La grille est centrée automatiquement sur la page.</p>
+        <p class="aide">Indiquez exactement la grille imprimée sur votre planche autocollante (comptez les étiquettes sur la feuille vierge), ou utilisez le raccourci Avery ci-dessus. La grille est centrée automatiquement sur la page.</p>
         <div class="duo">
           <div><label for="pl-dx">Décalage horizontal</label>
             <input type="number" id="pl-dx" value="0" min="-15" max="15" step="0.5" oninput="dessiner()"></div>
@@ -699,11 +738,7 @@ table.synthese tr.dom td{background:#F1EFF7;font-weight:700;font-size:8.5pt;
         <p class="aide" id="pl-note"></p>
       </div>
     </div>
-    <div class="rangee-io">
-      <button class="mini" onclick="enregistrerReglages()">Enregistrer mes réglages</button><button class="mini" onclick="choisirFichier()">Rouvrir un fichier</button>
-      <input type="file" id="io-fichier" accept=".json,application/json" style="display:none" onchange="ouvrirReglages(event)">
-      <p class="aide" id="io-note">Vos listes et vos réglages tiennent dans un petit fichier, à garder sur l'ordinateur.</p>
-    </div>
+    <p class="aide" style="text-align:center;margin-top:14px">Pour nommer et garder plusieurs réglages, direction l'onglet <b>Mes sauvegardes</b>.</p>
   </div>
 
   <details class="notice">
@@ -2285,7 +2320,166 @@ function telechargerBinaire(octetsLatin1,nom){
 }
 
 /* ================= Exports ================= */
-/* ---- Réglages : enregistrement et relecture ---- */
+/* ---- Sauvegardes nommées : un instantané par module, stocké sur ce poste ---- */
+var CLE_SAUVEGARDES="classe-madame-marion.sauvegardes";
+var SAUVEGARDES={};
+var PREFIXES_MODULE={
+  prenoms:["pr-","mp-","pl-"],
+  nombres:["nb-"],
+  ecriture:["ec-"],
+  paires:["pa-"],
+  cursive:["cu-"],
+  annuel:["an-"],
+  prog:["pg-"]
+};
+function champsDuModule(module){
+  var prefixes=PREFIXES_MODULE[module];
+  if(!prefixes){return [];}
+  var tous=tousLesChamps(),retenus=[],i,k;
+  for(i=0;i<tous.length;i++){
+    for(k=0;k<prefixes.length;k++){
+      if(tous[i].id.indexOf(prefixes[k])===0){retenus.push(tous[i]);break;}
+    }
+  }
+  return retenus;
+}
+function capturerModule(module){
+  var champs={},l=champsDuModule(module),i,n;
+  for(i=0;i<l.length;i++){
+    n=l[i];
+    champs[n.id]=(n.type==="checkbox")?(n.checked?1:0):n.value;
+  }
+  var extra={};
+  if(module==="annuel"){extra.annuel=ANNUEL;}
+  if(module==="prog"){extra.tableaux=TABLEAUX;}
+  return {champs:champs,extra:extra};
+}
+function appliquerModule(module,donnees){
+  var l=champsDuModule(module),i,n,v;
+  for(i=0;i<l.length;i++){
+    n=l[i];
+    if(!donnees.champs||!(n.id in donnees.champs)){continue;}
+    v=donnees.champs[n.id];
+    if(n.type==="checkbox"){n.checked=(v===1||v===true||v==="1");}
+    else{n.value=v;}
+  }
+  if(module==="annuel"&&donnees.extra&&donnees.extra.annuel){ANNUEL=donnees.extra.annuel;}
+  if(module==="prog"&&donnees.extra&&donnees.extra.tableaux){TABLEAUX=donnees.extra.tableaux;}
+}
+function chargerSauvegardesDisque(){
+  var m=memoireLocale(),brut;
+  if(!m){return;}
+  try{brut=m.getItem(CLE_SAUVEGARDES);if(brut){SAUVEGARDES=JSON.parse(brut)||{};}}
+  catch(e){SAUVEGARDES={};}
+}
+function sauverSauvegardesDisque(){
+  var m=memoireLocale();
+  if(!m){return false;}
+  try{m.setItem(CLE_SAUVEGARDES,JSON.stringify(SAUVEGARDES));return true;}
+  catch(e){return false;}
+}
+function nomModulePourAffichage(m){return TITRES[m]||m;}
+function moduleSauvegardeChoisi(){return $("sv-module").value;}
+function enregistrerInstantane(){
+  var module=moduleSauvegardeChoisi();
+  var nom=$("sv-nom").value.replace(/^\s+|\s+$/g,"");
+  if(!nom){texte($("sv-etat"),"Donnez un nom à cet instantané avant d'enregistrer — par exemple « GS » ou « MS ».");return;}
+  if(!SAUVEGARDES[module]){SAUVEGARDES[module]={};}
+  var precedent=SAUVEGARDES[module][nom]; // pour annuler proprement en cas d'échec
+  var existeDeja=!!precedent;
+  SAUVEGARDES[module][nom]={
+    donnees:capturerModule(module),
+    date:new Date().toISOString()
+  };
+  if(!sauverSauvegardesDisque()){
+    /* échec d'écriture : on annule le changement en mémoire pour que l'état affiché
+       corresponde toujours exactement à ce qui est réellement sur le disque */
+    if(existeDeja){SAUVEGARDES[module][nom]=precedent;}else{delete SAUVEGARDES[module][nom];}
+    texte($("sv-etat"),"Cet ordinateur n'autorise pas l'enregistrement automatique. Utilisez plutôt le fichier complet ci-dessous.");
+    rendreListeSauvegardes();
+    return;
+  }
+  $("sv-nom").value="";
+  texte($("sv-etat"),existeDeja?
+    "« "+nom+" » a été remplacé pour "+nomModulePourAffichage(module)+"."
+    :"« "+nom+" » enregistré pour "+nomModulePourAffichage(module)+".");
+  rendreListeSauvegardes();
+}
+function chargerInstantane(module,nom){
+  if(!SAUVEGARDES[module]||!SAUVEGARDES[module][nom]){return;}
+  appliquerModule(module,SAUVEGARDES[module][nom].donnees);
+  ouvrir(module);
+  texte($("compte"),"« "+nom+" » rechargé.");
+}
+function supprimerInstantane(module,nom){
+  if(!SAUVEGARDES[module]||!SAUVEGARDES[module][nom]){return;}
+  delete SAUVEGARDES[module][nom];
+  sauverSauvegardesDisque();
+  rendreListeSauvegardes();
+}
+function formaterDate(iso){
+  try{
+    var d=new Date(iso);
+    var jours=["dim.","lun.","mar.","mer.","jeu.","ven.","sam."];
+    return jours[d.getDay()]+" "+(d.getDate())+"/"+(d.getMonth()+1)+" à "+
+      (d.getHours()<10?"0":"")+d.getHours()+"h"+(d.getMinutes()<10?"0":"")+d.getMinutes();
+  }catch(e){return "";}
+}
+function rendreListeSauvegardes(){
+  var zone=$("sv-liste");
+  if(!zone){return;}
+  zone.innerHTML="";
+  var modules=Object.keys(PREFIXES_MODULE),total=0,m,noms,i,bloc,titre,ligne,nomSpan,dateSpan,btnCharger,btnSuppr;
+  for(m=0;m<modules.length;m++){
+    var mod=modules[m];
+    if(!SAUVEGARDES[mod]){continue;}
+    noms=Object.keys(SAUVEGARDES[mod]).sort();
+    if(!noms.length){continue;}
+    bloc=el("div","bloc-sauvegarde");
+    titre=el("div","titre-sauvegarde",nomModulePourAffichage(mod));
+    bloc.appendChild(titre);
+    for(i=0;i<noms.length;i++){
+      total++;
+      ligne=el("div","ligne-sauvegarde");
+      nomSpan=el("span","nom-sauvegarde",noms[i]);
+      dateSpan=el("span","date-sauvegarde",formaterDate(SAUVEGARDES[mod][noms[i]].date));
+      btnCharger=el("button","mini","Charger");
+      btnCharger.type="button";
+      btnCharger.onclick=(function(mo,no){return function(){chargerInstantane(mo,no);};})(mod,noms[i]);
+      btnSuppr=el("button","mini danger","Supprimer");
+      btnSuppr.type="button";
+      btnSuppr.onclick=(function(mo,no){return function(){
+        if(confirmerSuppression(no)){supprimerInstantane(mo,no);}
+      };})(mod,noms[i]);
+      ligne.appendChild(nomSpan);ligne.appendChild(dateSpan);
+      ligne.appendChild(btnCharger);ligne.appendChild(btnSuppr);
+      bloc.appendChild(ligne);
+    }
+    zone.appendChild(bloc);
+  }
+  if(!total){
+    zone.appendChild(el("p","aide","Aucun instantané enregistré pour l'instant. Réglez un module, revenez ici, donnez-lui un nom."));
+  }
+}
+function confirmerSuppression(nom){
+  return window.confirm?window.confirm("Supprimer « "+nom+" » ? Cette action ne peut pas être annulée."):true;
+}
+function faireSauvegardes(){
+  var sel=$("sv-module");
+  if(sel&&!sel._rempli){
+    var modules=Object.keys(PREFIXES_MODULE),i,o;
+    for(i=0;i<modules.length;i++){
+      o=el("option","",nomModulePourAffichage(modules[i]));o.value=modules[i];sel.appendChild(o);
+    }
+    sel._rempli=true;
+  }
+  if(sel&&MODULE_PRECEDENT&&PREFIXES_MODULE[MODULE_PRECEDENT]){sel.value=MODULE_PRECEDENT;}
+  rendreListeSauvegardes();
+  poserFeuilles([]);
+  texte($("compte"),"Rien à imprimer sur cette page : gérez vos sauvegardes à gauche.");
+}
+
+/* ---- Réglages : enregistrement et relecture (fichier complet, transportable) ---- */
 function tousLesChamps(){
   var tags=["input","select","textarea"],liste=[],t,i,l;
   for(t=0;t<tags.length;t++){
@@ -2300,10 +2494,10 @@ function enregistrerReglages(){
     n=l[i];
     champs[n.id]=(n.type==="checkbox")?(n.checked?1:0):n.value;
   }
-  var paquet={outil:"classe-madame-marion",version:3,module:actif,champs:champs,
-    tableaux:TABLEAUX,annuel:ANNUEL,syntheses:SYNTHESES};
+  var paquet={outil:"classe-madame-marion",version:4,module:actif,champs:champs,
+    tableaux:TABLEAUX,annuel:ANNUEL,syntheses:SYNTHESES,sauvegardes:SAUVEGARDES};
   telecharger(JSON.stringify(paquet),"Classe-Madame-Marion-reglages.json","application/json");
-  texte($("io-note"),"Réglages enregistrés. Rangez le fichier avec vos documents de classe.");
+  texte($("io-note"),"Fichier complet enregistré. Rangez-le avec vos documents de classe.");
 }
 function choisirFichier(){$("io-fichier").click();}
 function ouvrirReglages(evt){
@@ -2329,6 +2523,7 @@ function ouvrirReglages(evt){
     if(paquet.tableaux){TABLEAUX=paquet.tableaux;}
     if(paquet.annuel){ANNUEL=paquet.annuel;}
     if(paquet.syntheses){SYNTHESES=paquet.syntheses;sauverSyntheses();}
+    if(paquet.sauvegardes){SAUVEGARDES=paquet.sauvegardes;sauverSauvegardesDisque();}
     texte($("io-note"),"Réglages rouverts.");
     ouvrir(paquet.module||actif);
   };
@@ -2438,19 +2633,25 @@ function telecharger(contenu,nom,type){
 }
 
 /* ================= Navigation ================= */
-var MODULES=["prenoms","nombres","ecriture","paires","cursive","annuel","prog","synthese"];
+var MODULES=["prenoms","nombres","ecriture","paires","cursive","annuel","prog","synthese","sauvegardes"];
 var actif="prenoms";
+var MODULE_PRECEDENT="prenoms";
 var TITRES={prenoms:"Étiquettes prénoms",nombres:"Cartes nombres",ecriture:"Fiches d'écriture",
-            paires:"Jeu de paires",cursive:"Écriture cursive",annuel:"Progression annuelle",prog:"Programmation",synthese:"Synthèse des acquis"};
+            paires:"Jeu de paires",cursive:"Écriture cursive",annuel:"Progression annuelle",prog:"Programmation",
+            synthese:"Synthèse des acquis",sauvegardes:"Mes sauvegardes"};
 function ouvrir(nom){
+  if(actif!=="sauvegardes"&&PREFIXES_MODULE[actif]){MODULE_PRECEDENT=actif;}
   actif=nom;
   for(var i=0;i<MODULES.length;i++){
     $("p-"+MODULES[i]).style.display=(MODULES[i]===nom)?"":"none";
     $("t-"+MODULES[i]).setAttribute("aria-selected",MODULES[i]===nom?"true":"false");
   }
+  var estSauvegardes=(nom==="sauvegardes");
+  $("action-principale").style.display=estSauvegardes?"none":"";
   $("btn-word").style.display=(nom==="prog"||nom==="annuel")?"":"none";
   var direct=(nom==="prenoms");
   $("btn-pdf-secours").style.display=direct?"":"none";
+  $("pr-avery-raccourci").style.display=direct?"":"none";
   $("btn-pdf-principal").textContent=direct?"Télécharger le PDF":"Enregistrer en PDF";
   dessiner();
 }
@@ -2495,6 +2696,7 @@ function dessiner(){
   else if(actif==="cursive"){faireCursive();}
   else if(actif==="annuel"){faireAnnuelle();}
   else if(actif==="synthese"){faireSynthese();}
+  else if(actif==="sauvegardes"){faireSauvegardes();}
   else{faireProgrammation();}
   ajusterEchelle();
 }
@@ -2506,6 +2708,7 @@ $("pr-liste").value=CLASSE.join("\n");
 $("ec-liste").value=CLASSE.join("\n");
 $("sy-liste").value=CLASSE.join("\n");
 chargerSyntheses();
+chargerSauvegardesDisque();
 $("cu-mots").value=["lundi","mardi","mercredi"].join("\n");
 $("cu-liste").value=CLASSE.join("\n");
 $("pa-mots").value=["lundi","mardi","mercredi","jeudi","vendredi","école","cantine","récréation"].join("\n");
@@ -2524,7 +2727,7 @@ if(window.addEventListener){
 if(location.search.indexOf("module=")>-1){
   ouvrir(location.search.split("module=")[1].split("&")[0]);
 }else{
-  dessiner();
+  ouvrir("prenoms");
 }
 </script>
 </body>
