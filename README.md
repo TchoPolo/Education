@@ -18,7 +18,7 @@ Aucune installation, aucun compte, aucune connexion : rien ne sort de l'ordinate
 
 | Module | Ce qu'il produit |
 |---|---|
-| **Étiquettes prénoms** | Porte-manteaux, cahiers, casiers, bandes de présence. Capitales, script, cursive, ou deux écritures superposées. Formats prédéfinis ou sur mesure au millimètre. Deux dispositions : feuille libre (marge choisie, calcul automatique) ou **planche autocollante toute prête** (grille figée en colonnes × lignes, centrée sur la page, décalage de calibration réglable). |
+| **Étiquettes prénoms** | Porte-manteaux, cahiers, casiers, bandes de présence. Capitales, script, cursive, ou deux écritures superposées. Formats prédéfinis ou sur mesure au millimètre. Deux dispositions : feuille libre ou **planche autocollante toute prête** (grille figée en colonnes × lignes, centrée sur la page, décalage de calibration réglable). **Export PDF direct** : le fichier est écrit par le script lui-même, sans passer par la fenêtre d'impression du navigateur. |
 | **Cartes nombres** | Chiffre, constellation du dé, doigts de la main, collection de jetons, nombre en lettres. Pour le référentiel, le loto, le mémory. |
 | **Fiches d'écriture** | Lignes de repère, quadrillage ou cadre vierge, avec modèle à repasser. |
 | **Jeu de paires** | Mémory des graphies ou association chiffre / constellation. |
@@ -30,13 +30,18 @@ Aucune installation, aucun compte, aucune connexion : rien ne sort de l'ordinate
 
 ## Enregistrer et imprimer
 
-Le bouton **Enregistrer en PDF** ouvre la fenêtre d'impression du navigateur, avec le nom
-du fichier déjà rempli et les marges A4 déjà réglées. Dans « Destination », choisir
-**Enregistrer au format PDF**. Le PDF peut alors partir sur une clé USB et s'imprimer à l'école.
+**Étiquettes prénoms** dispose d'un export à part : le bouton **Télécharger le PDF**
+fabrique le fichier octet par octet, directement dans le script — aucune fenêtre
+d'impression n'intervient. C'est la méthode fiable pour un alignement au millimètre sur
+planche autocollante prédécoupée, puisqu'aucun réglage caché du navigateur (en-tête,
+pied de page, marge par défaut) ne peut décaler le résultat. Un lien discret,
+« Utiliser plutôt l'impression du navigateur », reste disponible en secours.
 
-L'adresse du site, la date et l'heure ne s'impriment pas : les marges sont portées par la
-feuille elle-même, le navigateur n'a plus la place d'ajouter ses en-têtes. Il reste à vérifier,
-une fois pour toutes, le format **A4** et l'échelle **100 %**.
+Les **autres modules** utilisent le bouton **Enregistrer en PDF**, qui ouvre la fenêtre
+d'impression du navigateur, avec le nom du fichier déjà rempli et les marges A4 déjà
+réglées. Dans « Destination », choisir **Enregistrer au format PDF**. L'adresse du site,
+la date et l'heure ne s'impriment pas : les marges sont portées par la feuille elle-même.
+Il reste à vérifier, une fois pour toutes, le format **A4** et l'échelle **100 %**.
 
 La programmation et la progression annuelle disposent en plus d'un export **Word** modifiable.
 
@@ -75,7 +80,7 @@ Deux contrôles voyagent avec le dépôt et ne demandent que Node.js :
 
 ```bash
 node tests/structure.js     # cohérence entre le HTML et le script
-node tests/banc-essai.js    # 71 scénarios limites sur les huit modules
+node tests/banc-essai.js    # 79 scénarios limites sur les huit modules
 ```
 
 `structure.js` vérifie que chaque identifiant et chaque fonction appelés par la page

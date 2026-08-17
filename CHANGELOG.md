@@ -1,5 +1,35 @@
 # Journal des versions
 
+## 2.3.0
+
+### Ajouté — export PDF direct pour les étiquettes, sans fenêtre d'impression
+La fenêtre d'impression du navigateur a son propre réglage d'en-tête et de pied de
+page, indépendant de tout ce que la page peut demander en CSS. Sur une planche
+d'étiquettes autocollantes, ce réglage caché suffit à décaler tout l'alignement — un
+plafond technique de l'impression par le navigateur, pas un défaut réglable côté page.
+
+Le bouton **Télécharger le PDF**, sur Étiquettes prénoms, contourne le problème à la
+racine : le fichier PDF est désormais écrit directement par le script, octet par octet,
+sans passer par aucune fenêtre d'impression. Plus d'en-tête, plus de pied de page, plus
+de marge par défaut du navigateur, puisqu'il n'y a plus de navigateur dans la boucle.
+
+Ce nouvel export couvre fidèlement tout ce que l'aperçu propose : capitales, script,
+écriture cursive (minuscules, majuscules, accents), pastille de niveau, point de départ,
+bordure pleine ou pointillée, formats prédéfinis ou sur mesure, feuille libre ou planche
+toute prête avec décalage de calibration, et la pagination automatique sur plusieurs
+feuilles. L'ancienne méthode par la fenêtre d'impression reste disponible en secours,
+via un lien discret sous le nouveau bouton.
+
+Vérifié fichier par fichier avec `qpdf --check` sur onze scénarios (structure PDF
+valide), et à l'image pour chacun : alignement de la grille planche vérifié au dixième
+de millimètre près, y compris avec un décalage de calibration.
+
+### Corrigé au passage
+- Les lettres cursives de l'export direct étaient démesurées et se chevauchaient avec le
+  texte en capitales (mauvaise échelle de proportion, corrigée).
+- La notice mentionnait encore l'absence de majuscules cursives, alors qu'elles sont
+  disponibles depuis une version précédente ; le texte est à jour.
+
 ## 2.2.0
 
 ### Ajouté — impression sur planches d'étiquettes autocollantes toutes prêtes

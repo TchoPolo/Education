@@ -111,6 +111,10 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--corail);
   border-radius:12px;padding:12px;font-family:var(--titre);font-size:15px;font-weight:700;
   cursor:pointer;margin-top:10px}
 .btn-word:hover{background:var(--ivoire)}
+.btn-secours{display:block;width:100%;background:transparent;color:var(--encre-doux);border:0;
+  padding:10px 4px 2px;font-family:var(--sans);font-size:12.5px;font-weight:600;text-decoration:underline;
+  cursor:pointer;text-align:center}
+.btn-secours:hover{color:var(--encre)}
 .btn-pdf:focus-visible,.btn-word:focus-visible,.mini:focus-visible,.preset:focus-visible{
   outline:3px solid var(--jaune);outline-offset:2px}
 .compte{font-size:13px;color:var(--encre-doux);margin:12px 0 0;text-align:center}
@@ -643,7 +647,8 @@ table.synthese tr.dom td{background:#F1EFF7;font-weight:700;font-size:8.5pt;
   </div>
 
   <div class="action">
-    <button class="btn-pdf" onclick="exporterPDF()">Enregistrer en PDF</button>
+    <button class="btn-pdf" id="btn-pdf-principal" onclick="cliquerBoutonPrincipal()">Enregistrer en PDF</button>
+    <button class="btn-secours" id="btn-pdf-secours" onclick="exporterPDF()" style="display:none">Utiliser plutôt l'impression du navigateur</button>
     <button class="btn-word" id="btn-word" onclick="exporterWord()" style="display:none">Enregistrer en Word</button>
     <p class="compte" id="compte">&nbsp;</p>
     <div class="reglage-feuille">
@@ -700,14 +705,15 @@ table.synthese tr.dom td{background:#F1EFF7;font-weight:700;font-size:8.5pt;
   <details class="notice">
     <summary>Notice</summary>
     <ul>
-      <li><b>Enregistrer en PDF :</b> le bouton ouvre la fenêtre d'impression, avec le nom du fichier déjà rempli. Dans « Destination » ou « Imprimante », choisissez <b>Enregistrer au format PDF</b>, puis Enregistrer. Le PDF part sur une clé USB et s'imprime à l'école.</li>
-      <li><b>Imprimer directement :</b> même bouton, choisissez votre imprimante au lieu du PDF.</li>
-      <li>L'adresse du site, la date et l'heure ne s'impriment pas : les marges sont portées par la feuille elle-même, le navigateur n'a plus la place de les ajouter. Si votre navigateur les affiche malgré tout, décochez « En-têtes et pieds de page » dans la fenêtre d'impression.</li>
-      <li>Vérifiez une fois pour toutes, dans la fenêtre d'impression : format <b>A4</b> et échelle <b>100 %</b>.</li>
-      <li><b>Enregistrer en Word :</b> disponible sur la programmation. Le fichier s'ouvre dans Word et reste modifiable.</li>
+      <li><b>Étiquettes prénoms — Télécharger le PDF :</b> ce bouton fabrique le fichier PDF directement, sans passer par la fenêtre d'impression du navigateur. Aucun en-tête, pied de page ou marge cachée ne peut décaler l'alignement : c'est la méthode fiable pour imprimer sur une planche autocollante prédécoupée.</li>
+      <li><b>« Utiliser plutôt l'impression du navigateur » :</b> solution de secours si le PDF direct pose un problème sur votre ordinateur. Elle passe par la fenêtre d'impression classique — voir les points ci-dessous sur les en-têtes et marges.</li>
+      <li><b>Autres modules — Enregistrer en PDF :</b> le bouton ouvre la fenêtre d'impression, avec le nom du fichier déjà rempli. Dans « Destination » ou « Imprimante », choisissez <b>Enregistrer au format PDF</b>, puis Enregistrer.</li>
+      <li>Sur ces autres modules, l'adresse du site, la date et l'heure ne s'impriment pas : les marges sont portées par la feuille elle-même. Si votre navigateur les affiche malgré tout, décochez « En-têtes et pieds de page » dans la fenêtre d'impression, et vérifiez le format <b>A4</b> et l'échelle <b>100 %</b>.</li>
+      <li><b>Enregistrer en Word :</b> disponible sur la programmation et la progression annuelle. Le fichier s'ouvre dans Word et reste modifiable.</li>
       <li>Tout se passe sur cet ordinateur, sans internet. Rien n'est envoyé nulle part.</li>
       <li><b>Enregistrer mes réglages</b> range vos listes de prénoms, vos mots et tous vos réglages dans un petit fichier. <b>Rouvrir un fichier</b> les remet en place, à la rentrée suivante ou sur un autre ordinateur.</li>
-      <li><b>Écriture cursive :</b> les modèles sont dessinés trait par trait par l'outil, sans police à installer. Cette première version couvre les minuscules et les lettres accentuées ; les majuscules cursives arrivent ensuite.</li>
+      <li><b>Planche d'étiquettes toute prête :</b> indiquez le nombre d'étiquettes par ligne et par colonne compté sur votre feuille vierge. Si l'alignement n'est pas parfait, ajustez les décalages horizontal et vertical en millimètres.</li>
+      <li><b>Écriture cursive :</b> les modèles sont dessinés trait par trait par l'outil, sans police à installer. Minuscules, majuscules et lettres accentuées sont couvertes.</li>
     </ul>
   </details>
 </div>
@@ -798,19 +804,26 @@ function grillePlanche(l,h){
   var hautMm=(297-hauteurGrille)/2+dy;
   return {cols:cols,lig:lig,gauche:gaucheMm,haut:hautMm,largeur:largeurGrille,hauteur:hauteurGrille};
 }
+/* Calcul de grille partagé par l'aperçu HTML et l'export PDF direct :
+   un seul calcul, deux sorties, aucun risque que l'un promette un nombre
+   et que l'autre en imprime un différent. */
+function calculerGrille(l,h){
+  var planche=dispositionPlanche();
+  if(planche){
+    var g0=grillePlanche(l,h);
+    return {cols:g0.cols,lig:g0.lig,gauche:g0.gauche,haut:g0.haut,gout:0,planche:true};
+  }
+  return {cols:combien(UTILE_L,l),lig:combien(UTILE_H,h),gauche:MARGE,haut:MARGE,gout:GOUT,planche:false};
+}
 function poserCartes(cartes,l,h){
   var c=$("feuilles");
   c.innerHTML="";
   if(!cartes.length){vider();return;}
-  var planche=dispositionPlanche();
-  var cols,lig,gaucheMm=0,hautMm=0,gout=GOUT;
-  if(planche){
-    var g0=grillePlanche(l,h);
-    cols=g0.cols;lig=g0.lig;gaucheMm=g0.gauche;hautMm=g0.haut;gout=0;
-    texte($("pl-note"),"Grille centrée : "+arr(g0.gauche)+" mm depuis le bord gauche, "+
-      arr(g0.haut)+" mm depuis le haut. Si votre planche a une marge imprimeur différente, ajustez le décalage ci-dessus.");
-  }else{
-    cols=combien(UTILE_L,l);lig=combien(UTILE_H,h);gaucheMm=MARGE;hautMm=MARGE;
+  var grille=calculerGrille(l,h);
+  var cols=grille.cols,lig=grille.lig,gaucheMm=grille.gauche,hautMm=grille.haut,gout=grille.gout;
+  if(grille.planche){
+    texte($("pl-note"),"Grille centrée : "+arr(gaucheMm)+" mm depuis le bord gauche, "+
+      arr(hautMm)+" mm depuis le haut. Si votre planche a une marge imprimeur différente, ajustez le décalage ci-dessus.");
   }
   var parPage=cols*lig,pages=Math.ceil(cartes.length/parPage),p,i,f,g;
   /* Chaque carte reçoit sa position exacte en millimètres, calculée par le script.
@@ -1888,6 +1901,370 @@ function caseEditable(i,champ,largeur){
   return td;
 }
 
+/* ================================================================
+   Générateur PDF minimal, sans dépendance.
+   Écrit directement les octets d'un fichier PDF : pas de bibliothèque,
+   pas de navigateur, pas de fenêtre d'impression. Ce que le script
+   place à telle position en millimètres est exactement ce qui
+   s'imprime, sans aucun réglage caché pouvant décaler le résultat.
+   ================================================================ */
+
+function nouveauPDF(){
+  return {objets:[], pages:[], polices:{}};
+}
+function ajouterObjet(doc,corps){
+  doc.objets.push(corps);
+  return doc.objets.length; // numéro d'objet PDF, 1-indexé
+}
+function reserverObjet(doc){doc.objets.push(null);return doc.objets.length;}
+function remplirObjet(doc,numero,corps){doc.objets[numero-1]=corps;}
+function mmVersPt(mm){return mm*72/25.4;}
+
+/* ---- Encodage du texte : WinAnsi couvre tous les accents français utilisés ici ---- */
+function pdfEchappe(t){
+  return String(t).replace(/\\/g,"\\\\").replace(/\(/g,"\\(").replace(/\)/g,"\\)");
+}
+function versLatin1(t){
+  var out="",i,c;
+  for(i=0;i<t.length;i++){
+    c=t.charCodeAt(i);
+    out+=String.fromCharCode(c>255?63:c); // '?' de repli, ne devrait jamais arriver ici
+  }
+  return out;
+}
+
+/* ---- Police : les 14 polices standard PDF ne nécessitent aucun fichier embarqué ---- */
+function police(doc,nom){
+  if(doc.polices[nom]){return doc.polices[nom];}
+  var n=ajouterObjet(doc,
+    "<< /Type /Font /Subtype /Type1 /BaseFont /"+nom+" /Encoding /WinAnsiEncoding >>");
+  doc.polices[nom]=n;
+  return n;
+}
+
+/* ---- Une page = une zone de dessin en millimètres, origine en haut à gauche ---- */
+function nouvellePage(doc,largeurMm,hauteurMm){
+  var page={largeurMm:largeurMm,hauteurMm:hauteurMm,flux:[]};
+  doc.pages.push(page);
+  return page;
+}
+function y_pdf(page,yMm){return mmVersPt(page.hauteurMm-yMm);} // bascule haut-gauche -> bas-gauche
+
+function texteRempli(page,xMm,yMm,taillePt,chaine,gras,couleur){
+  var c=couleur||[0.125,0.137,0.247];
+  page._policeGras=page._policeGras||{}; // marqueur pour renseigner les polices utilisées
+  page.flux.push(
+    "q "+c[0]+" "+c[1]+" "+c[2]+" rg BT /"+(gras?"F2":"F1")+" "+taillePt+" Tf "+
+    mmVersPt(xMm)+" "+y_pdf(page,yMm)+" Td ("+pdfEchappe(versLatin1(chaine))+") Tj ET Q"
+  );
+  page._utilise=page._utilise||{};page._utilise[gras?"F2":"F1"]=1;
+}
+function ligne(page,x1,y1,x2,y2,epaisseurMm,couleur,pointilles){
+  var c=couleur||[0.129,0.149,0.271];
+  page.flux.push(
+    "q "+c[0]+" "+c[1]+" "+c[2]+" RG "+mmVersPt(epaisseurMm)+" w "+
+    (pointilles?"["+mmVersPt(pointilles[0])+" "+mmVersPt(pointilles[1])+"] 0 d ":"")+
+    mmVersPt(x1)+" "+y_pdf(page,y1)+" m "+mmVersPt(x2)+" "+y_pdf(page,y2)+" l S Q"
+  );
+}
+function rectangle(page,xMm,yMm,lMm,hMm,epaisseurMm,couleur,pointilles){
+  var c=couleur||[0.129,0.149,0.271];
+  page.flux.push(
+    "q "+c[0]+" "+c[1]+" "+c[2]+" RG "+mmVersPt(epaisseurMm)+" w "+
+    (pointilles?"["+mmVersPt(pointilles[0])+" "+mmVersPt(pointilles[1])+"] 0 d ":"")+
+    mmVersPt(xMm)+" "+y_pdf(page,yMm+hMm)+" "+mmVersPt(lMm)+" "+mmVersPt(hMm)+" re S Q"
+  );
+}
+/* cercle par 4 arcs de Bézier, approximation standard (k=0.5523) */
+function cercle(page,cxMm,cyMm,rMm,couleur,rempli){
+  var c=couleur||[0.247,0.839,0.702];
+  var k=0.5523*rMm;
+  var cx=mmVersPt(cxMm),cy=y_pdf(page,cyMm),r=mmVersPt(rMm),kk=mmVersPt(k);
+  page.flux.push(
+    "q "+c[0]+" "+c[1]+" "+c[2]+" "+(rempli?"rg":"RG")+" "+
+    (cx+r)+" "+cy+" m "+
+    (cx+r)+" "+(cy+kk)+" "+(cx+kk)+" "+(cy+r)+" "+cx+" "+(cy+r)+" c "+
+    (cx-kk)+" "+(cy+r)+" "+(cx-r)+" "+(cy+kk)+" "+(cx-r)+" "+cy+" c "+
+    (cx-r)+" "+(cy-kk)+" "+(cx-kk)+" "+(cy-r)+" "+cx+" "+(cy-r)+" c "+
+    (cx+kk)+" "+(cy-r)+" "+(cx+r)+" "+(cy-kk)+" "+(cx+r)+" "+cy+" c "+
+    (rempli?"f":"S")+" Q"
+  );
+}
+
+/* ---- Chemin vectoriel (M/C absolus, comme nos glyphes cursifs) ----
+   xMm,yMm : origine du glyphe sur la page, en millimètres.
+   echelle : mm par unité de glyphe. largeurTrait en mm. */
+function cheminSVG(page,d,xMm,yMm,echelle,largeurTraitMm,couleur){
+  var c=couleur||[0.129,0.149,0.271];
+  var nombres=d.match(/-?\d+(?:\.\d+)?/g);
+  if(!nombres){return;}
+  var i=0,ops=[],cmd,n=nombres.map(parseFloat);
+  var lettres=d.match(/[MC]/g)||[];
+  var idxNombre=0;
+  function pt(gx,gy){
+    return (mmVersPt(xMm+gx*echelle))+" "+y_pdf(page,yMm+gy*echelle);
+  }
+  for(i=0;i<lettres.length;i++){
+    cmd=lettres[i];
+    if(cmd==="M"){
+      ops.push(pt(n[idxNombre],n[idxNombre+1])+" m");
+      idxNombre+=2;
+    }else if(cmd==="C"){
+      ops.push(pt(n[idxNombre],n[idxNombre+1])+" "+pt(n[idxNombre+2],n[idxNombre+3])+" "+
+        pt(n[idxNombre+4],n[idxNombre+5])+" c");
+      idxNombre+=6;
+    }
+  }
+  page.flux.push("q "+c[0]+" "+c[1]+" "+c[2]+" RG "+mmVersPt(largeurTraitMm)+
+    " w 1 J 1 j "+ops.join(" ")+" S Q");
+}
+
+/* ---- Assemblage final : objets, table de références croisées, trailer ---- */
+function finaliserPDF(doc){
+  /* Deux emplacements réservés d'abord : Catalogue et Pages doivent connaître
+     le numéro final de leurs objets liés avant même que ceux-ci existent.
+     Réserver la place évite toute collision avec les objets ajoutés ensuite. */
+  var numCatalogue=reserverObjet(doc);
+  var numPages=reserverObjet(doc);
+  var i,pg,numContenu,numPage,flux,resDict,refsPages=[];
+
+  var polF1=police(doc,"Helvetica"),polF2=police(doc,"Helvetica-Bold");
+
+  for(i=0;i<doc.pages.length;i++){
+    pg=doc.pages[i];
+    flux=pg.flux.join("\n");
+    numContenu=ajouterObjet(doc,"<< /Length "+flux.length+" >>\nstream\n"+flux+"\nendstream");
+    resDict="<< /Font << /F1 "+polF1+" 0 R /F2 "+polF2+" 0 R >> >>";
+    numPage=ajouterObjet(doc,
+      "<< /Type /Page /Parent "+numPages+" 0 R /MediaBox [0 0 "+
+      mmVersPt(pg.largeurMm)+" "+mmVersPt(pg.hauteurMm)+"] /Resources "+resDict+
+      " /Contents "+numContenu+" 0 R >>");
+    refsPages.push(numPage);
+  }
+  remplirObjet(doc,numCatalogue,"<< /Type /Catalog /Pages "+numPages+" 0 R >>");
+  remplirObjet(doc,numPages,
+    "<< /Type /Pages /Kids ["+refsPages.map(function(n){return n+" 0 R";}).join(" ")+
+    "] /Count "+refsPages.length+" >>");
+
+  var sortie="%PDF-1.4\n";
+  var offsets=[0],pos=sortie.length;
+  for(i=0;i<doc.objets.length;i++){
+    offsets.push(pos);
+    var bloc=(i+1)+" 0 obj\n"+doc.objets[i]+"\nendobj\n";
+    sortie+=bloc;
+    pos+=bloc.length;
+  }
+  var debutXref=pos;
+  sortie+="xref\n0 "+(doc.objets.length+1)+"\n0000000000 65535 f \n";
+  for(i=0;i<doc.objets.length;i++){
+    sortie+=(String(offsets[i+1]).padStart(10,"0"))+" 00000 n \n";
+  }
+  sortie+="trailer\n<< /Size "+(doc.objets.length+1)+" /Root "+numCatalogue+" 0 R >>\nstartxref\n"+debutXref+"\n%%EOF";
+  return sortie;
+}
+
+/* ---- Largeurs Helvetica / Helvetica-Bold, métriques standard (1/1000 em) ----
+   Valeurs fixes des 14 polices de base PDF : ne dépendent d'aucun fichier,
+   garanties identiques sur n'importe quel lecteur PDF. */
+var LARGEUR_HELV={" ":278,"!":278,'"':355,"'":191,"-":333,".":278,",":278,
+"0":556,"1":556,"2":556,"3":556,"4":556,"5":556,"6":556,"7":556,"8":556,"9":556,
+"a":556,"b":556,"c":500,"d":556,"e":556,"f":278,"g":556,"h":556,"i":222,"j":222,
+"k":500,"l":222,"m":833,"n":556,"o":556,"p":556,"q":556,"r":333,"s":500,"t":278,
+"u":556,"v":500,"w":722,"x":500,"y":500,"z":500,
+"A":667,"B":667,"C":722,"D":722,"E":667,"F":611,"G":778,"H":722,"I":278,"J":500,
+"K":667,"L":556,"M":833,"N":722,"O":778,"P":667,"Q":778,"R":722,"S":667,"T":611,
+"U":722,"V":667,"W":944,"X":667,"Y":667,"Z":611};
+var LARGEUR_HELV_GRAS={" ":278,"!":333,'"':474,"'":238,"-":333,".":278,",":278,
+"0":556,"1":556,"2":556,"3":556,"4":556,"5":556,"6":556,"7":556,"8":556,"9":556,
+"a":556,"b":611,"c":556,"d":611,"e":556,"f":333,"g":611,"h":611,"i":278,"j":278,
+"k":556,"l":278,"m":889,"n":611,"o":611,"p":611,"q":611,"r":389,"s":556,"t":333,
+"u":611,"v":556,"w":778,"x":556,"y":556,"z":500,
+"A":722,"B":722,"C":722,"D":722,"E":667,"F":611,"G":778,"H":722,"I":278,"J":556,
+"K":722,"L":611,"M":889,"N":722,"O":778,"P":667,"Q":778,"R":722,"S":667,"T":611,
+"U":722,"V":667,"W":944,"X":667,"Y":667,"Z":611};
+/* Toute lettre accentuée a, en Helvetica, la même chasse que sa lettre de base. */
+function largeurCarac(c,gras){
+  var base=c;
+  if(LETTRES_ACCENTUEES_LARGEUR[c]){base=LETTRES_ACCENTUEES_LARGEUR[c];}
+  var table=gras?LARGEUR_HELV_GRAS:LARGEUR_HELV;
+  return table[base]!==undefined?table[base]:table[base.toLowerCase()]!==undefined?table[base.toLowerCase()]:556;
+}
+var LETTRES_ACCENTUEES_LARGEUR={"é":"e","è":"e","ê":"e","ë":"e","à":"a","â":"a","ä":"a",
+"î":"i","ï":"i","ô":"o","ö":"o","ù":"u","û":"u","ü":"u","ç":"c",
+"É":"E","È":"E","Ê":"E","À":"A","Â":"A","Ç":"C","Î":"I","Ô":"O","Ù":"U"};
+function largeurTexte(t,taillePt,gras){
+  var s=0;
+  for(var i=0;i<t.length;i++){s+=largeurCarac(t.charAt(i),gras);}
+  return s*taillePt/1000;
+}
+
+/* ================= Export PDF direct (étiquettes) ================= */
+/* Construit le PDF octet par octet : aucune fenêtre d'impression, donc
+   aucun en-tête, pied de page ou marge de navigateur ne peut décaler quoi
+   que ce soit. Ce que le calcul place en millimètres est ce qui s'imprime. */
+var COULEUR_ENCRE=[0.125,0.137,0.247];
+var COULEUR_GRISE=[0.75,0.75,0.83];
+var COULEUR_MENTHE=[0.369,0.839,0.702];
+var COULEUR_JAUNE=[1,0.788,0.290];
+
+function motCursifPDF(page,mot,xMm,yMm,unite,couleur){
+  var x=2*unite,i,c,acc,g,haut;
+  for(i=0;i<mot.length;i++){
+    c=mot.charAt(i);acc=null;haut=false;
+    if(MAJ_ACCENTUEES[c]){acc=MAJ_ACCENTUEES[c][1];c=MAJ_ACCENTUEES[c][0];}
+    if(CURSIVE_MAJ[c]){g=CURSIVE_MAJ[c];haut=true;}
+    else{
+      if(LETTRES_ACCENTUEES[c]){acc=LETTRES_ACCENTUEES[c][1];c=LETTRES_ACCENTUEES[c][0];}
+      else{c=c.toLowerCase();}
+      g=CURSIVE[c];
+    }
+    if(!g){continue;}
+    if(g.d){cheminSVG(page,g.d,xMm+x,yMm,unite,Math.max(unite*0.11,0.12),couleur);}
+    if(acc){
+      var dy=(haut&&acc!=="cedille")?-8*unite:0;
+      cheminSVG(page,SIGNES[acc],xMm+x+g.w*0.45*unite,yMm+dy,unite,Math.max(unite*0.1,0.1),couleur);
+    }
+    x+=g.w*unite;
+    if(g.e&&i<mot.length-1){
+      cheminSVG(page,"M0,0 C1.6,0.6 1.4,-2.4 2.4,-3.4",xMm+x,yMm+g.e*unite,unite,Math.max(unite*0.11,0.12),couleur);
+      x+=2.4*unite;
+    }
+  }
+  return x; // largeur totale en mm du mot tracé, pour un centrage éventuel
+}
+function largeurCursifPDF(mot,unite){
+  var x=2*unite,i,c,g;
+  for(i=0;i<mot.length;i++){
+    c=mot.charAt(i);
+    if(MAJ_ACCENTUEES[c]){c=MAJ_ACCENTUEES[c][0];}
+    if(CURSIVE_MAJ[c]){g=CURSIVE_MAJ[c];}
+    else{
+      if(LETTRES_ACCENTUEES[c]){c=LETTRES_ACCENTUEES[c][0];}else{c=c.toLowerCase();}
+      g=CURSIVE[c];
+    }
+    if(!g){continue;}
+    x+=g.w*unite;
+    if(g.e&&i<mot.length-1){x+=2.4*unite;}
+  }
+  return x;
+}
+function texteCentre(page,texte,cxMm,yMm,taillePt,gras,couleur){
+  var l=largeurTexte(texte,taillePt,gras)*25.4/72; // pt -> mm
+  texteRempli(page,cxMm-l/2,yMm,taillePt,texte,gras,couleur);
+}
+
+function dessinerEtiquettePDF(page,xMm,yMm,l,h,nom,reglages){
+  var cadre=reglages.cadre,decoupe=reglages.decoupe,niveau=reglages.niveau;
+  var graphie=reglages.graphie,depart=reglages.depart,taillePt=reglages.taille;
+  var mixte=reglages.mixte;
+  if(cadre||decoupe){
+    rectangle(page,xMm,yMm,l,h,cadre?0.25:0.2,COULEUR_ENCRE,
+      (decoupe)?[1.2,0.9]:null);
+  }
+  if(niveau){
+    var cx=xMm+l-2.7-0.3,cy=yMm+2.7+0.3;
+    cercle(page,cx,cy,2.7,niveau==="ms"?COULEUR_JAUNE:COULEUR_MENTHE,true);
+    texteCentre(page,niveau.toUpperCase(),cx,cy+1.3,6,true,COULEUR_ENCRE);
+  }
+  var centreX=xMm+l/2;
+
+  if(graphie==="cursive"||graphie==="caps-cursive"){
+    var yBase=yMm+(mixte?h*0.68:h*0.62);
+    if(graphie==="caps-cursive"){
+      texteCentre(page,nom.toUpperCase(),centreX,yMm+h*0.36,taillePt*0.9,true,COULEUR_ENCRE);
+      ligne(page,xMm+l*0.18,yMm+h*0.46,xMm+l*0.82,yMm+h*0.46,0.12,[0.86,0.85,0.82]);
+    }
+    var unite=Math.min((l-8)/Math.max(largeurCursifPDF(nom,1),1),(mixte?(h-8)*0.62:h-6)/38);
+    var largeurMot=largeurCursifPDF(nom,unite);
+    motCursifPDF(page,nom,centreX-largeurMot/2,yBase,unite,COULEUR_ENCRE);
+    return;
+  }
+  if(graphie==="deux"){
+    var yCaps=yMm+h*0.40,ySep=yMm+h*0.5,yScript=yMm+h*0.72;
+    if(depart){
+      var lTxt=largeurTexte(nom.toUpperCase(),taillePt,true)*25.4/72;
+      var xd=centreX-(lTxt+3.6)/2;
+      cercle(page,xd+1.2,yCaps-taillePt*0.09,1.2,COULEUR_MENTHE,true);
+      texteRempli(page,xd+3.2,yCaps,taillePt,nom.toUpperCase(),true,COULEUR_ENCRE);
+    }else{
+      texteCentre(page,nom.toUpperCase(),centreX,yCaps,taillePt,true,COULEUR_ENCRE);
+    }
+    ligne(page,xMm+l*0.14,ySep,xMm+l*0.86,ySep,0.1,[0.86,0.85,0.82]);
+    texteCentre(page,nom.toLowerCase(),centreX,yScript,taillePt*0.8,false,COULEUR_ENCRE);
+    return;
+  }
+  var yUnique=yMm+h*0.56;
+  if(graphie==="caps"){
+    if(depart){
+      var lTxt2=largeurTexte(nom.toUpperCase(),taillePt,true)*25.4/72;
+      var xd2=centreX-(lTxt2+3.6)/2;
+      cercle(page,xd2+1.2,yUnique-taillePt*0.09,1.2,COULEUR_MENTHE,true);
+      texteRempli(page,xd2+3.2,yUnique,taillePt,nom.toUpperCase(),true,COULEUR_ENCRE);
+    }else{
+      texteCentre(page,nom.toUpperCase(),centreX,yUnique,taillePt,true,COULEUR_ENCRE);
+    }
+  }else{ // script seul
+    if(depart){
+      var lTxt3=largeurTexte(nom.toLowerCase(),taillePt,false)*25.4/72;
+      var xd3=centreX-(lTxt3+3.6)/2;
+      cercle(page,xd3+1.2,yUnique-taillePt*0.09,1.2,COULEUR_MENTHE,true);
+      texteRempli(page,xd3+3.2,yUnique,taillePt,nom.toLowerCase(),false,COULEUR_ENCRE);
+    }else{
+      texteCentre(page,nom.toLowerCase(),centreX,yUnique,taillePt,false,COULEUR_ENCRE);
+    }
+  }
+}
+
+function exporterEtiquettesPDF(){
+  majZoneUtile();
+  var noms=lignes($("pr-liste").value),format=$("pr-format").value,perso=(format==="perso");
+  var d=perso?["0","0"]:format.split("x");
+  var L,H,graphie=$("pr-graphie").value;
+  if(perso){L=mesure($("pr-larg").value,2,19,9);H=mesure($("pr-haut").value,1,27.7,3.2);}
+  else{L=parseFloat(d[0]);H=parseFloat(d[1]);}
+  var copies=borne($("pr-copies").value,1,12,1),niveau=$("pr-niveau").value;
+  var cadre=$("pr-cadre").checked,depart=$("pr-depart").checked,decoupe=$("pr-decoupe").checked;
+  var mixte=(graphie==="deux"||graphie==="caps-cursive");
+  var taillePt=tailleCommune(noms,L,H,mixte,depart?2:0);
+
+  var liste=[],i,k;
+  for(i=0;i<noms.length;i++){for(k=0;k<copies;k++){liste.push(noms[i]);}}
+  if(!liste.length){
+    texte($("compte"),"Rien à exporter en PDF direct : ajoutez au moins un prénom.");
+    return;
+  }
+
+  var grille=calculerGrille(L,H);
+  var cols=grille.cols,lig=grille.lig,gaucheMm=grille.gauche,hautMm=grille.haut,gout=grille.gout;
+  var parPage=cols*lig,pages=Math.ceil(liste.length/parPage);
+  var reglages={cadre:cadre,decoupe:decoupe,niveau:niveau,graphie:graphie,depart:depart,
+    taille:taillePt,mixte:mixte};
+
+  var doc=nouveauPDF(),p,page,idx,col,rang,xMm,yMm;
+  for(p=0;p<pages;p++){
+    page=nouvellePage(doc,210,297);
+    for(i=p*parPage;i<Math.min((p+1)*parPage,liste.length);i++){
+      idx=i-p*parPage;col=idx%cols;rang=Math.floor(idx/cols);
+      xMm=gaucheMm+col*(L+gout);
+      yMm=hautMm+rang*(H+gout);
+      dessinerEtiquettePDF(page,xMm,yMm,L,H,liste[i],reglages);
+    }
+  }
+  var octets=finaliserPDF(doc);
+  telechargerBinaire(octets,nomFichier()+".pdf");
+  texte($("compte"),liste.length+(liste.length>1?" étiquettes":" étiquette")+" sur "+pages+
+    (pages>1?" pages":" page")+" — PDF téléchargé directement, sans passer par l'impression.");
+}
+function telechargerBinaire(octetsLatin1,nom){
+  var tableau=new Uint8Array(octetsLatin1.length),i;
+  for(i=0;i<octetsLatin1.length;i++){tableau[i]=octetsLatin1.charCodeAt(i)&0xff;}
+  var blob=new Blob([tableau],{type:"application/pdf"});
+  var a=document.createElement("a"),url=URL.createObjectURL(blob);
+  a.href=url;a.download=nom;
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},500);
+}
+
 /* ================= Exports ================= */
 /* ---- Réglages : enregistrement et relecture ---- */
 function tousLesChamps(){
@@ -2053,7 +2430,18 @@ function ouvrir(nom){
     $("t-"+MODULES[i]).setAttribute("aria-selected",MODULES[i]===nom?"true":"false");
   }
   $("btn-word").style.display=(nom==="prog"||nom==="annuel")?"":"none";
+  var direct=(nom==="prenoms");
+  $("btn-pdf-secours").style.display=direct?"":"none";
+  $("btn-pdf-principal").textContent=direct?"Télécharger le PDF":"Enregistrer en PDF";
   dessiner();
+}
+/* Sur les étiquettes, le bouton principal télécharge un PDF fabriqué directement
+   par le script : aucune fenêtre d'impression, donc aucun en-tête, pied de page
+   ou marge de navigateur ne peut décaler l'alignement. Les autres modules
+   continuent d'utiliser l'impression du navigateur pour cette version. */
+function cliquerBoutonPrincipal(){
+  if(actif==="prenoms"){exporterEtiquettesPDF();}
+  else{exporterPDF();}
 }
 /* Sur écran étroit, la feuille A4 est réduite pour tenir dans la largeur.
    L'impression, elle, reste toujours à l'échelle réelle. */
