@@ -116,6 +116,13 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--corail);
 .compte{font-size:13px;color:var(--encre-doux);margin:12px 0 0;text-align:center}
 .reglage-feuille{margin-top:16px;padding-top:14px;border-top:1px solid var(--bord)}
 .reglage-feuille .duo{margin-bottom:2px}
+.segment{background:var(--ivoire);border:1.5px solid var(--bord);border-radius:10px;
+  padding:3px;margin-bottom:12px;font-size:0}
+.seg{display:inline-block;width:50%;border:0;background:transparent;border-radius:7px;
+  padding:9px 6px;font-family:var(--sans);font-size:12.5px;font-weight:700;color:var(--encre-doux);
+  cursor:pointer;vertical-align:top;line-height:1.3}
+.seg[aria-selected="true"]{background:#fff;color:var(--encre);box-shadow:0 2px 6px rgba(10,12,30,.14)}
+.seg:focus-visible{outline:3px solid var(--jaune);outline-offset:1px}
 .rangee-io{margin-top:14px;padding-top:14px;border-top:1px solid var(--bord)}
 .rangee-io .mini{width:calc(50% - 4px);margin:0 0 0 0}
 .rangee-io .mini:first-child{margin-right:6px}
@@ -640,23 +647,48 @@ table.synthese tr.dom td{background:#F1EFF7;font-weight:700;font-size:8.5pt;
     <button class="btn-word" id="btn-word" onclick="exporterWord()" style="display:none">Enregistrer en Word</button>
     <p class="compte" id="compte">&nbsp;</p>
     <div class="reglage-feuille">
-      <span class="legende">Mise en page de la feuille</span>
-      <div class="duo">
-        <div><label for="mp-marge">Marge</label>
-          <select id="mp-marge" onchange="dessiner()">
-            <option value="10" selected>10 mm — confort</option>
-            <option value="7">7 mm</option>
-            <option value="5">5 mm — serré</option>
-            <option value="3">3 mm — maximum</option>
-          </select></div>
-        <div><label for="mp-gout">Espace entre</label>
-          <select id="mp-gout" onchange="dessiner()">
-            <option value="2" selected>2 mm</option>
-            <option value="1">1 mm</option>
-            <option value="0">Aucun, bords jointifs</option>
-          </select></div>
+      <span class="legende">Disposition sur la feuille</span>
+      <div class="segment" role="tablist" aria-label="Disposition">
+        <button type="button" class="seg" id="mp-seg-auto" aria-selected="true" onclick="choisirDisposition('auto')">Feuille libre</button>
+        <button type="button" class="seg" id="mp-seg-planche" aria-selected="false" onclick="choisirDisposition('planche')">Planche d'étiquettes toute prête</button>
       </div>
-      <p class="aide">Réduisez la marge pour faire tenir davantage d'étiquettes sur la feuille. Vérifiez que votre imprimante accepte cette marge.</p>
+
+      <div id="mp-bloc-auto">
+        <div class="duo">
+          <div><label for="mp-marge">Marge de la feuille</label>
+            <select id="mp-marge" onchange="dessiner()">
+              <option value="10" selected>10 mm — confort</option>
+              <option value="7">7 mm</option>
+              <option value="5">5 mm — serré</option>
+              <option value="3">3 mm — maximum</option>
+            </select></div>
+          <div><label for="mp-gout">Espace entre</label>
+            <select id="mp-gout" onchange="dessiner()">
+              <option value="2" selected>2 mm</option>
+              <option value="1">1 mm</option>
+              <option value="0">Aucun, bords jointifs</option>
+            </select></div>
+        </div>
+        <p class="aide">Pour imprimer sur du papier ordinaire : le nombre d'étiquettes qui tient est calculé automatiquement. Réduisez la marge pour en faire tenir davantage.</p>
+      </div>
+
+      <div id="mp-bloc-planche" style="display:none">
+        <div class="duo">
+          <div><label for="pl-cols">Étiquettes par ligne</label>
+            <input type="number" id="pl-cols" value="3" min="1" max="10" oninput="dessiner()"></div>
+          <div><label for="pl-lignes">Étiquettes par colonne</label>
+            <input type="number" id="pl-lignes" value="8" min="1" max="15" oninput="dessiner()"></div>
+        </div>
+        <p class="aide">Indiquez exactement la grille imprimée sur votre planche autocollante (comptez les étiquettes sur la feuille vierge). La grille est centrée automatiquement sur la page.</p>
+        <div class="duo">
+          <div><label for="pl-dx">Décalage horizontal</label>
+            <input type="number" id="pl-dx" value="0" min="-15" max="15" step="0.5" oninput="dessiner()"></div>
+          <div><label for="pl-dy">Décalage vertical</label>
+            <input type="number" id="pl-dy" value="0" min="-15" max="15" step="0.5" oninput="dessiner()"></div>
+        </div>
+        <p class="aide">Si le texte imprimé n'est pas exactement centré sur vos étiquettes, faites un essai sur papier ordinaire, posez-le contre votre planche à la lumière, et ajustez ces deux décalages en millimètres jusqu'à ce que ça tombe juste.</p>
+        <p class="aide" id="pl-note"></p>
+      </div>
     </div>
     <div class="rangee-io">
       <button class="mini" onclick="enregistrerReglages()">Enregistrer mes réglages</button><button class="mini" onclick="choisirFichier()">Rouvrir un fichier</button>
@@ -722,38 +754,85 @@ function majZoneUtile(){
   UTILE_L=210-2*MARGE;
   UTILE_H=297-2*MARGE;
 }
-function habillerFeuille(f){f.style.padding=MARGE+"mm";}
+function dispositionPlanche(){return $("mp-seg-planche").getAttribute("aria-selected")==="true";}
+function choisirDisposition(mode){
+  var planche=(mode==="planche");
+  $("mp-seg-auto").setAttribute("aria-selected",planche?"false":"true");
+  $("mp-seg-planche").setAttribute("aria-selected",planche?"true":"false");
+  $("mp-bloc-auto").style.display=planche?"none":"";
+  $("mp-bloc-planche").style.display=planche?"":"none";
+  dessiner();
+}
+/* Feuille libre : padding uniforme, calculé pour occuper au mieux la page.
+   Planche toute prête : la grille (fixée par l'utilisateur) est centrée sur
+   la page, puis affinée par un décalage manuel en X et Y. */
+function habillerFeuille(f){
+  if(!dispositionPlanche()){f.style.padding=MARGE+"mm";}
+}
 function combien(utile,dim){
   var n=Math.floor((utile+GOUT)/(dim+GOUT));
   while(n>1&&(n*dim+(n-1)*GOUT)>utile){n--;}
   return Math.max(n,1);
 }
-function cartesParPage(l,h){
-  return combien(UTILE_L,l)*combien(UTILE_H,h);
+function borneNombre(v,mini,maxi,defaut){
+  var n=parseInt(v,10);
+  if(isNaN(n)){return defaut;}
+  return n<mini?mini:(n>maxi?maxi:n);
+}
+function decalageMm(v){
+  var n=parseFloat(String(v).replace(",","."));
+  if(isNaN(n)){return 0;}
+  return Math.max(-30,Math.min(30,n));
+}
+/* Grille de la planche : nombre de colonnes et de lignes fixé par l'utilisateur
+   (il compte les étiquettes sur sa feuille vierge), grille centrée sur la page
+   A4 puis affinée par un décalage manuel. Aucune marge n'est calculée : c'est
+   la disposition réelle du produit qui commande, pas un choix de confort. */
+function grillePlanche(l,h){
+  var cols=borneNombre($("pl-cols").value,1,10,3);
+  var lig=borneNombre($("pl-lignes").value,1,15,8);
+  var dx=decalageMm($("pl-dx").value);
+  var dy=decalageMm($("pl-dy").value);
+  var largeurGrille=cols*l,hauteurGrille=lig*h;
+  var gaucheMm=(210-largeurGrille)/2+dx;
+  var hautMm=(297-hauteurGrille)/2+dy;
+  return {cols:cols,lig:lig,gauche:gaucheMm,haut:hautMm,largeur:largeurGrille,hauteur:hauteurGrille};
 }
 function poserCartes(cartes,l,h){
   var c=$("feuilles");
   c.innerHTML="";
   if(!cartes.length){vider();return;}
-  var cols=combien(UTILE_L,l),lig=combien(UTILE_H,h);
+  var planche=dispositionPlanche();
+  var cols,lig,gaucheMm=0,hautMm=0,gout=GOUT;
+  if(planche){
+    var g0=grillePlanche(l,h);
+    cols=g0.cols;lig=g0.lig;gaucheMm=g0.gauche;hautMm=g0.haut;gout=0;
+    texte($("pl-note"),"Grille centrée : "+arr(g0.gauche)+" mm depuis le bord gauche, "+
+      arr(g0.haut)+" mm depuis le haut. Si votre planche a une marge imprimeur différente, ajustez le décalage ci-dessus.");
+  }else{
+    cols=combien(UTILE_L,l);lig=combien(UTILE_H,h);gaucheMm=MARGE;hautMm=MARGE;
+  }
   var parPage=cols*lig,pages=Math.ceil(cartes.length/parPage),p,i,f,g;
   /* Chaque carte reçoit sa position exacte en millimètres, calculée par le script.
      Aucun retour à la ligne implicite : ce que le calcul décide est ce qui s'affiche,
      quel que soit le moteur du navigateur, y compris les plus anciens. */
-  var largeurGrille=cols*l+(cols-1)*GOUT;
-  var hauteurGrille=lig*h+(lig-1)*GOUT;
+  var largeurGrille=cols*l+(cols-1)*gout;
+  var hauteurGrille=lig*h+(lig-1)*gout;
   for(p=0;p<pages;p++){
     f=el("div","sheet");habillerFeuille(f);
     g=el("div","grille");
-    g.style.position="relative";
+    g.style.position="absolute";
+    g.style.left=arr(gaucheMm)+"mm";
+    g.style.top=arr(hautMm)+"mm";
     g.style.width=largeurGrille+"mm";
     g.style.height=hauteurGrille+"mm";
+    f.style.position="relative";
     for(i=p*parPage;i<Math.min((p+1)*parPage,cartes.length);i++){
       var idx=i-p*parPage,col=idx%cols,rang=Math.floor(idx/cols);
       var carte=cartes[i];
       carte.style.position="absolute";
-      carte.style.left=(col*(l+GOUT))+"mm";
-      carte.style.top=(rang*(h+GOUT))+"mm";
+      carte.style.left=(col*(l+gout))+"mm";
+      carte.style.top=(rang*(h+gout))+"mm";
       g.appendChild(carte);
     }
     f.appendChild(g);
@@ -892,8 +971,11 @@ function faireEtiquettes(){
   if(perso){
     L=mesure($("pr-larg").value,2,19,9);
     H=mesure($("pr-haut").value,1,27.7,3.2);
+    var parPageNote=dispositionPlanche()?
+      (borneNombre($("pl-cols").value,1,10,3)*borneNombre($("pl-lignes").value,1,15,8)):
+      (combien(UTILE_L,L)*combien(UTILE_H,H));
     texte($("pr-perso-note"),"Étiquette de "+arrondi(L/10)+" × "+arrondi(H/10)+" cm : "+
-      (combien(UTILE_L,L)*combien(UTILE_H,H))+" par feuille.");
+      parPageNote+" par feuille.");
   }else{
     L=parseFloat(d[0]);H=parseFloat(d[1]);
   }

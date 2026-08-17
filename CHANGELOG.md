@@ -1,5 +1,27 @@
 # Journal des versions
 
+## 2.2.0
+
+### Ajouté — impression sur planches d'étiquettes autocollantes toutes prêtes
+Le mode précédent (marge choisie, calcul automatique) supposait une impression sur
+papier libre. Il ne convient pas aux planches autocollantes prédécoupées, dont la
+grille est fixée par le produit et non par un choix de confort.
+
+Nouveau mode **« Planche d'étiquettes toute prête »** : on indique directement le
+nombre d'étiquettes par ligne et par colonne compté sur la feuille vierge (par exemple
+3 × 8), la grille se centre automatiquement sur la page A4, sans aucune marge calculée.
+Deux réglages de décalage (horizontal et vertical, en millimètres, positifs ou négatifs)
+permettent de calibrer finement l'alignement sur une planche réelle : imprimer un essai
+sur papier ordinaire, le poser contre la planche à la lumière, ajuster jusqu'à ce que ça
+tombe juste.
+
+Vérifié position par position : une planche 3 × 8 en 6,4 × 3,4 cm centre sa grille à
+9 mm du bord gauche et 12,5 mm du bord haut, chaque étiquette exactement à sa place ;
+un décalage de calibration se répercute fidèlement sur la position de toute la grille.
+
+Le centrage du texte à l'intérieur de chaque étiquette a été revérifié à l'image,
+horizontalement et verticalement.
+
 ## 2.1.0
 
 ### Corrigé — bug confirmé sur les étiquettes personnalisées
