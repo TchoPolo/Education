@@ -14,7 +14,7 @@ moyenne section / grande section.
 Un seul fichier, `index.html`. On l'ouvre d'un double-clic, on règle, on enregistre en PDF.
 Aucune installation, aucun compte, aucune connexion : rien ne sort de l'ordinateur.
 
-## Les neuf générateurs
+## Les onze générateurs
 
 | Module | Ce qu'il produit |
 |---|---|
@@ -27,6 +27,8 @@ Aucune installation, aucun compte, aucune connexion : rien ne sort de l'ordinate
 | **Progression annuelle** | La trame des cinq périodes, une ligne MS et une ligne GS par compétence, rappel des vacances. Un domaine ou les six à la suite. Export PDF et Word. |
 | **Programmation** | Un tableau par domaine, colonne MS et colonne GS. Export PDF et Word. |
 | **Synthèse des acquis** | Le bilan de fin de grande section, un document par élève, conforme aux six domaines. Grille à cocher, bloc de commentaire, signatures. |
+| **Mes élèves** | Le registre de la classe : prénom, nom facultatif, niveau GS ou MS. Ajout en lot par copier-coller, édition ligne à ligne. Alimente le bilan de compétences. |
+| **Bilan de compétences** | Deux documents en un : un bilan illustré par élève (29 compétences, icônes, texte modifiable, GS et MS distincts), et une **grille à cocher en atelier** — tous les prénoms de la classe, trois cases au stylo (non acquis, en cours, acquis), une feuille par compétence observée. |
 | **Mes sauvegardes** | Enregistre les réglages d'un module sous un nom choisi — par exemple des étiquettes pour les GS, puis une autre version pour les MS — pour y revenir en un clic. Chaque instantané reste propre à son module. |
 
 ## Enregistrer et imprimer
@@ -53,6 +55,29 @@ en dessous, les réglages puis la feuille, les onglets défilant horizontalement
 Sur petit écran la feuille A4 est **réduite pour tenir dans la largeur**, mais elle
 s'imprime toujours à l'échelle réelle. Les champs de saisie font 16 px au minimum,
 sous peine de voir l'iPhone zoomer tout seul dès qu'on touche un champ.
+
+## Mes élèves et Bilan de compétences
+
+**Mes élèves** est le registre unique de la classe : prénom, nom facultatif, niveau. Un
+copier-coller ("un élève par ligne") permet de tout saisir en une fois — collez d'abord vos
+GS avec le niveau réglé sur Grande section, puis vos MS.
+
+**Bilan de compétences** s'appuie sur ce registre, avec deux usages distincts choisis par
+un bouton en haut du module :
+
+- **Bilan illustré par élève** : pour chaque compétence des six domaines du programme, une
+  icône, un intitulé et un texte modifiable — deux formulations distinctes, une pour la
+  grande section et une pour la moyenne section. Choisir un élève règle automatiquement le
+  bon niveau ; choisir « toute la classe » génère une feuille par élève avec, à chaque fois,
+  le niveau qui lui correspond.
+- **Grille à cocher en atelier** : le document pensé pour l'usage en classe. On choisit un
+  domaine et une compétence (ou « toutes les compétences de ce domaine », une feuille par
+  compétence), et la feuille imprimée liste tous les prénoms de la classe avec trois cases
+  à cocher au stylo — non acquis, en cours, acquis — pendant l'observation en atelier. Les
+  deux formulations MS et GS de la compétence sont rappelées en haut de la feuille.
+
+Le texte de chaque compétence peut être ajusté directement dans l'aperçu du bilan par élève ;
+un bouton permet de tout ramener au texte d'origine du programme.
 
 ## Sauvegardes nommées
 
@@ -92,12 +117,12 @@ Deux contrôles voyagent avec le dépôt et ne demandent que Node.js :
 
 ```bash
 node tests/structure.js     # cohérence entre le HTML et le script
-node tests/banc-essai.js    # 93 scénarios limites sur les neuf modules
+node tests/banc-essai.js    # 115 scénarios limites sur les onze modules
 ```
 
 `structure.js` vérifie que chaque identifiant et chaque fonction appelés par la page
 existent réellement, et que chaque module a son onglet et son panneau.
-`banc-essai.js` rejoue les neuf modules dans un DOM simulé : listes vides, bornes inversées,
+`banc-essai.js` rejoue les onze modules dans un DOM simulé : listes vides, bornes inversées,
 dimensions aberrantes, caractères non gérés, aller-retour du fichier de réglages, mémoire locale du poste, export Word.
 
 À lancer avant toute mise en ligne. Les deux doivent afficher zéro échec.

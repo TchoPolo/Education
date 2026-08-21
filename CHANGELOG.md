@@ -1,5 +1,66 @@
 # Journal des versions
 
+## 3.1.0
+
+### Ajouté — grille à cocher en atelier
+Le bilan de compétences par élève, livré dans la version précédente, ne correspondait pas
+à l'usage réel en classe : cocher une compétence pour tous les élèves pendant un atelier,
+au stylo, sur une seule feuille.
+
+Nouveau mode dans le module Bilan de compétences, choisi par un bouton en haut du panneau :
+**Grille à cocher en atelier**. On choisit un domaine et une compétence (ou toutes les
+compétences du domaine d'un coup, une feuille chacune), le niveau d'élèves à afficher, et
+la feuille imprimée liste tous les prénoms de la classe avec trois cases à cocher —
+non acquis, en cours, acquis — prête à être remplie pendant l'observation. Les formulations
+MS et GS de la compétence sont rappelées en haut de la feuille pour ne pas avoir à s'y
+replonger en plein atelier.
+
+Le bilan illustré par élève de la version précédente reste disponible tel quel, choisi par
+le même bouton bascule.
+
+Vérifié : le nombre de feuilles générées correspond exactement à la sélection (une
+compétence choisie, une feuille ; tout un domaine, une feuille par compétence), tous les
+élèves de la classe apparaissent sur chaque grille, le filtre par niveau exclut bien les
+élèves de l'autre niveau, et la bascule entre les deux modes ne laisse aucun résidu d'un
+mode sur l'autre.
+
+## 3.0.0
+
+### Ajouté — module Mes élèves
+Le registre unique de la classe : prénom, nom facultatif, niveau (grande ou moyenne
+section). Ajout en lot par copier-coller pour saisir toute la classe d'un coup, édition
+ligne à ligne ensuite. Sert de socle au nouveau bilan de compétences.
+
+### Ajouté — module Bilan de compétences
+Un document A4 illustré, construit à partir des six domaines du programme (BO n° 19 du
+7 mai 2026) déjà utilisés par la Programmation et la Synthèse des acquis. 29 compétences,
+chacune avec :
+- une icône dessinée spécifiquement pour elle (bibliothèque de 29 pictogrammes maison,
+  dans l'esprit graphique de l'outil) ;
+- un texte modifiable directement dans l'aperçu, avec un bouton pour revenir au texte
+  d'origine du programme ;
+- deux formulations distinctes, l'une pour la grande section, l'autre pour la moyenne
+  section — jamais la même compétence présentée de la même façon aux deux niveaux.
+
+Choisir un élève dans la liste règle automatiquement le bon niveau depuis Mes élèves.
+Choisir « toute la classe » génère une feuille par élève, chacune à son propre niveau,
+sans rien à régler à la main. Un mode « les deux niveaux, l'un après l'autre » permet
+aussi d'imprimer une version de référence complète, GS puis MS.
+
+Les modifications de texte sont propres à ce module : elles n'affectent jamais les
+données utilisées par la Programmation ou la Synthèse des acquis.
+
+### Corrigé au passage
+- Deux défauts trouvés dans mes propres brouillons avant toute mise en ligne : une
+  variable de couleur manquante faisait échouer plusieurs icônes, et une boucle infinie
+  entre deux fonctions internes plantait l'affichage du module.
+- Six icônes peu lisibles au premier contrôle visuel ont été redessinées (alphabet,
+  danse, spectacle, plan, tablette, ciseaux).
+- Le bloc de réglage « marge de la feuille », pensé pour les étiquettes et les cartes,
+  s'affichait sur tous les modules sans distinction, y compris là où il n'a aucun sens
+  (fiches d'écriture, cursive, programmation, synthèse, bilan). Il ne s'affiche
+  désormais que pour les modules qui impriment une grille de cartes.
+
 ## 2.4.0
 
 ### Corrigé — le raccourci Avery n'apparaissait pas
